@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Weather AI</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: url('https://images.unsplash.com/photo-1504386106331-3e4e71712b38') no-repeat center center fixed;
+      background-size: cover;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+      backdrop-filter: brightness(0.7);
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      text-shadow: 1px 1px 4px #000;
+      font-size: 2.5em;
+    }
+
+    input {
+      padding: 12px 15px;
+      border: none;
+      border-radius: 10px;
+      outline: none;
+      font-size: 16px;
+      width: 80%;
+      max-width: 300px;
+      text-align: center;
+    }
+
+    button {
+      margin-top: 10px;
+      padding: 12px 25px;
+      border: none;
+      border-radius: 10px;
+      background-color: #ffffffcc;
+      color: #333;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #ffffff;
+    }
+
+    #output {
+      margin-top: 40px;
+      font-size: 22px;
+      text-align: center;
+      min-height: 40px;
+      white-space: pre-line;
+      text-shadow: 1px 1px 2px #000;
+      width: 90%;
+      max-width: 400px;
+      word-wrap: break-word;
+    }
+
+    .typing {
+      border-right: 2px solid white;
+      animation: blink 0.7s steps(1) infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { border-color: transparent; }
+      50% { border-color: white; }
+    }
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 2em;
+      }
+      #output {
+        font-size: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Weather AI</h1>
+  <input id="locationInput" type="text" placeholder="Enter your current location" />
+  <button onclick="startWeatherOnce()">Check Weather</button>
+  <div id="output"></div>
+
+  <script>
+    const output = document.getElementById("output");
+    let hasRun = false; // Prevent running twice
+
+    function delay(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    async function showMessageWithDots(message, time = 2000) {
+      output.textContent = message;
+      let dots = 0;
+      const dotInterval = setInterval(() => {
+        dots = (dots + 1) % 4;
+        output.textContent = message + '.'.repeat(dots);
+      }, 500);
+      await delay(time);
+      clearInterval(dotInterval);
+    }
+
+    async function startWeatherOnce() {
+      const location = document.getElementById("locationInput").value.trim();
+      if (!location) {
+        output.textContent = "⚠️ Please enter your current location first.";
+        return;
+      }
+      if (hasRun) return; // Don't allow multiple runs
+      hasRun = true;
+
+      await showMessageWithDots(`Fetching weather data for ${location}`, 2500);
+      await showMessageWithDots("Gathering information", 2500);
+      await showMessageWithDots("Analyzing satellite images", 3000);
+
+      output.textContent = "";
+      await delay(700);
+      await typeSentence("🤷 IDK man, just look outside!", 80);
+    }
+
+    function typeSentence(sentence, speed) {
+      return new Promise(resolve => {
+        let i = 0;
+        output.innerHTML = `<span id="typed" class="typing"></span>`;
+        const typed = document.getElementById("typed");
+
+        const typer = setInterval(() => {
+          typed.textContent += sentence.charAt(i);
+          i++;
+          if (i > sentence.length) {
+            clearInterval(typer);
+            typed.classList.remove("typing");
+            resolve();
+          }
+        }, speed);
+      });
+    }
+  </script>
+</body>
+</html>
